@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "anyulled"
+    reviewers:
+      - "anyulled"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
