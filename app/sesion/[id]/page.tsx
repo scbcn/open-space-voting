@@ -8,9 +8,12 @@ export function generateStaticParams() {
   }));
 }
 
-export default function SessionPage({ params }: { params: { id: string } }) {
+export default async function SessionPage(props: Readonly<{
+  params: Promise<{ id: string }>
+}>) {
+  const params = await props.params;
   const session = mockSessions[params.id];
-  
+
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center">

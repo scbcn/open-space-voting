@@ -5,7 +5,10 @@ export async function generateStaticParams() {
   return await getEventIds();
 }
 
-export default async function EditEventPage({ params }: { params: { id: string } }) {
+export default async function EditEventPage(props: Readonly<{
+    params: Promise<{ id: string }>
+}>) {
+  const params = await props.params;
   const event = await getEvent(params.id);
 
   if (!event) {
