@@ -1,12 +1,14 @@
-import { getEvent, getEventIds } from "@/lib/data/events";
-import { EventPageClient } from "./event-page-client";
+import {getEvent, getEventIds} from "@/lib/data/events";
+import {EventPageClient} from "./event-page-client";
 
 export async function generateStaticParams() {
-  const events = await getEventIds();
-  return events;
+  return await getEventIds();
 }
 
-export default async function EventPage({ params }: { params: { id: string } }) {
+export default async function EventPage(props: Readonly<{
+  params: Promise<{ id: string }>
+}>) {
+  const params = await props.params;
   const event = await getEvent(params.id);
 
   if (!event) {
