@@ -1,15 +1,15 @@
-import { getEvent, getEventIds } from "@/lib/data/events";
+import { getEventByCode } from "@/app/actions/events";
 import { EventForm } from "@/components/admin/event-form";
 
-export async function generateStaticParams() {
-  return await getEventIds();
-}
+// export async function generateStaticParams() {
+//   return await getEventByCode();
+// }
 
 export default async function EditEventPage(props: Readonly<{
-    params: Promise<{ id: string }>
+    params: Promise<{ code: string }>
 }>) {
   const params = await props.params;
-  const event = await getEvent(params.id);
+  const event = await getEventByCode(params.code);
 
   if (!event) {
     return (

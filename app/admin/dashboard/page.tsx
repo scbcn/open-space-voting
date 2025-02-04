@@ -3,45 +3,52 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { useAccess } from "@/lib/context/access-context";
 import { OpenSpaceEvent } from "@/lib/types";
 import { EventCard } from "@/components/admin/event-card";
 import Link from "next/link";
+import { getEvents } from "@/app/actions/events";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { access } = useAccess();
-  const [events, setEvents] = useState<OpenSpaceEvent[]>([
-    {
-      id: "os-1",
-      name: "Tech Innovation Summit 2024",
-      description: "Un espacio para compartir las últimas tendencias en tecnología",
-      date: "2024-06-15",
-      location: "Madrid",
-      maxParticipants: 100,
-      status: "published",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      allowProposals: false,
-      allowVoting: false
-    }
-  ]);
+  const [events, setEvents] = useState<OpenSpaceEvent[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!access?.isAdmin) {
       router.push("/admin/login");
+      return;
     }
+
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        const eventsList = await getEvents();
+        console.log(eventsList);
+        setEvents(eventsList);
+      } catch (error) {
+        console.error("Error al cargar eventos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
   }, [access, router]);
 
-  const handleDeleteEvent = (eventId: string) => {
+  const handleDeleteEvent = (eventCode: string) => {
     // In a real app, this would make an API call
-    setEvents(events.filter(event => event.id !== eventId));
+    setEvents(events.filter(event => event.code !== eventCode));
   };
 
   if (!access?.isAdmin) {
     return null;
+  }
+
+  if (loading) {
+    return <div className="min-h-screen p-8 bg-background">Cargando...</div>;
   }
 
   return (
@@ -60,7 +67,7 @@ export default function AdminDashboardPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {events.map((event) => (
             <EventCard 
-              key={event.id} 
+              key={event.code} 
               event={event} 
               onDelete={handleDeleteEvent}
             />

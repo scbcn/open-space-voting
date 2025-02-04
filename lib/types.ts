@@ -36,7 +36,7 @@ export interface OpenSpaceAccess {
 }
 
 export interface OpenSpaceEvent {
-  id: string;
+  code: string;
   name: string;
   description: string;
   date: string;

@@ -1,0 +1,9 @@
+{
+  "provider": "google",
+  "providerId": "admin-123456",
+  "email": "admin@example.com",
+  "name": "Administrador",
+  "avatar": "https://example.com/avatar.jpg",
+  "role": "admin",
+  "createdAt": { "$date": "2024-02-04T12:00:00.000Z" }
+}
