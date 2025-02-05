@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAccess } from "@/lib/context/access-context";
 import { OpenSpaceEvent } from "@/lib/types";
-import { getCurrentEvent } from "@/lib/data/current-event";
+import { getEventByCode } from "@/app/actions/events";
 
 export function WelcomeContent() {
   const { access } = useAccess();
@@ -14,7 +14,7 @@ export function WelcomeContent() {
 
   useEffect(() => {
     if (access?.spaceId) {
-      getCurrentEvent(access.spaceId).then(setEvent);
+      getEventByCode(access.spaceId).then(setEvent);
     }
   }, [access?.spaceId]);
 
