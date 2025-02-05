@@ -16,7 +16,7 @@ export interface IOpenSpaceEvent extends Document {
 
 const EventSchema = new Schema<IOpenSpaceEvent>(
   {
-    code: { type: String, required: true },
+    code: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     description: { type: String, required: true },
     date: { type: String, required: true }, // Se mantiene como string para coincidir con la interfaz

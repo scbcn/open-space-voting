@@ -4,44 +4,73 @@ import { connectDB } from "@/lib/mongoose";
 import Event, { IOpenSpaceEvent } from "@/models/Event";
 import mongoose from "mongoose";
 
-type EventInput = Omit<IOpenSpaceEvent, '_id' | 'createdAt' | 'updatedAt'>;
+type EventInput = {
+  code: string;
+  name: string;
+  description: string;
+  date: string;
+  location: string;
+  maxParticipants: number;
+  status: "draft" | "published" | "completed";
+  allowProposals: boolean;
+  allowVoting: boolean;
+};
+
 type EventWithId = IOpenSpaceEvent & { _id: mongoose.Types.ObjectId };
 
-export async function getEvents() {
-  console.log("getEvents");
-  await connectDB();
-  const events = (await Event.find().sort({ date: 1 }).lean()) as unknown as EventWithId[];
-  
-  return events.map(event => ({
-    ...event,
-    _id: event._id.toString()
-  }));
-}
+// Tipo para el objeto serializado que devolveremos
+type SerializedEvent = {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  date: string;
+  location: string;
+  maxParticipants: number;
+  status: "draft" | "published" | "completed";
+  allowProposals: boolean;
+  allowVoting: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
 
-export async function getEventByCode(code: string){
-  await connectDB();
-
-  console.log("getEventByCode", code);
-  const event = (await Event.findOne({ code }).lean()) as unknown as EventWithId;
-  if (!event) return null;
+// Función auxiliar para serializar un evento
+function serializeEvent(event: any): SerializedEvent {
   return {
-    ...event,
-    _id: event._id.toString()
+    id: event._id.toString(),
+    code: event.code,
+    name: event.name,
+    description: event.description,
+    date: event.date,
+    location: event.location,
+    maxParticipants: Number(event.maxParticipants),
+    status: event.status,
+    allowProposals: Boolean(event.allowProposals),
+    allowVoting: Boolean(event.allowVoting),
+    createdAt: event.createdAt?.toISOString() || '',
+    updatedAt: event.updatedAt?.toISOString() || ''
   };
 }
 
+export async function getEvents() {
+  await connectDB();
+  const events = await Event.find().sort({ date: 1 }).lean();
+  return events.map(serializeEvent);
+}
 
+export async function getEventByCode(code: string) {
+  await connectDB();
+  const event = await Event.findOne({ code }).lean();
+  if (!event) return null;
+  return serializeEvent(event);
+}
 
 export async function getEventById(id: string) {
   await connectDB();
   if (!mongoose.Types.ObjectId.isValid(id)) return null;
-  const event = (await Event.findById(id).lean()) as unknown as EventWithId;
+  const event = await Event.findById(id).lean();
   if (!event) return null;
-  
-  return {
-    ...event,
-    _id: event._id.toString()
-  };
+  return serializeEvent(event);
 }
 
 export async function createEvent(data: EventInput) {
@@ -54,4 +83,17 @@ export async function createEvent(data: EventInput) {
   });
   await newEvent.save();
   return newEvent;
+}
+
+export async function updateEvent(id: string, data: Partial<EventInput>) {
+  console.log("updateEvent called", id, data);
+  await connectDB();
+  const event = await Event.findByIdAndUpdate(id, data, { new: true });
+  return serializeEvent(event);
+  //return event;
+}
+
+export async function deleteEvent(id: string) {
+  await connectDB();
+  await Event.findByIdAndDelete(id);
 }

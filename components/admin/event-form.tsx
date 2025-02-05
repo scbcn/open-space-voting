@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,24 +11,26 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { OpenSpaceEvent } from "@/lib/types";
 import { LockOpen, Lock, ThumbsUp } from "lucide-react";
+import { updateEvent } from "@/app/actions/events";
 
 interface EventFormProps {
-  initialEvent?: Partial<OpenSpaceEvent>;
-  mode: 'create' | 'edit';
+  initialEvent: OpenSpaceEvent;
+  mode: "create" | "edit";
 }
 
-export function EventForm({ initialEvent, mode }: EventFormProps) {
+export function EventForm({ initialEvent, mode }: EventFormProps): React.JSX.Element {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    spaceId: initialEvent?.id || "",
-    name: initialEvent?.name || "",
-    description: initialEvent?.description || "",
-    date: initialEvent?.date || "",
-    location: initialEvent?.location || "",
-    maxParticipants: initialEvent?.maxParticipants?.toString() || "",
-    allowProposals: initialEvent?.allowProposals || false,
-    allowVoting: initialEvent?.allowVoting || false,
-    status: initialEvent?.status || "draft"
+    id: initialEvent.id,
+    code: initialEvent.code,
+    name: initialEvent.name,
+    description: initialEvent.description,
+    date: initialEvent.date,
+    location: initialEvent.location,
+    maxParticipants: initialEvent.maxParticipants?.toString() ?? "",
+    allowProposals: initialEvent.allowProposals ?? false,
+    allowVoting: initialEvent.allowVoting ?? false,
+    status: initialEvent.status ?? "draft"
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -36,10 +38,19 @@ export function EventForm({ initialEvent, mode }: EventFormProps) {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, save to backend
-    router.push("/admin/dashboard");
+    
+    try {
+      const eventData = {
+        ...formData,
+        maxParticipants: parseInt(formData.maxParticipants)
+      };
+      await updateEvent(formData.id, eventData);
+      router.replace("/admin/dashboard", { scroll: false });
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
   };
 
   return (
@@ -98,7 +109,7 @@ export function EventForm({ initialEvent, mode }: EventFormProps) {
           <Input
             id="spaceId"
             placeholder="Ej: os-2024"
-            value={formData.spaceId}
+            value={formData.code}
             onChange={handleChange}
             required
           />
