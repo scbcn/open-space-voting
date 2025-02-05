@@ -10,7 +10,7 @@ import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SocialLogin } from "./social-login";
-import { Separator } from "@/components/ui/separator";
+import { getEventByCode } from "@/app/actions/events";
 
 interface AccessFormProps {
   onAccess: (data: OpenSpaceAccess) => void;
@@ -21,7 +21,7 @@ export function AccessForm({ onAccess }: AccessFormProps) {
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -30,11 +30,12 @@ export function AccessForm({ onAccess }: AccessFormProps) {
       return;
     }
 
-    // Temporary validation - In production this would check against a backend
-    if (spaceId === "demo") {
+    const event = await getEventByCode(spaceId);
+    if (spaceId === event?.code) {
+      
       onAccess({ spaceId, username });
     } else {
-      setError('Para acceder usa el ID de evento: "demo"');
+      setError('Para acceder usa el ID de event proporcionado por el organizador');
     }
   };
 
@@ -92,7 +93,7 @@ export function AccessForm({ onAccess }: AccessFormProps) {
               required
             />
             <p className="text-xs text-muted-foreground">
-              Para acceso temporal, usa el ID de evento "demo"
+              Para acceso temporal, usa el ID de evento proporcionado por el organizador
             </p>
           </div>
 
