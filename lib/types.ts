@@ -1,5 +1,5 @@
 export interface Theme {
-  id: string;
+  id?: string;
   title: string;
   description: string;
   author: string;
@@ -7,6 +7,7 @@ export interface Theme {
   schedule?: string;
   votes: number;
   votedBy: string[];
+  event: string;
 }
 
 export interface Session {

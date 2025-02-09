@@ -3,71 +3,59 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeCard } from "@/components/themes/theme-card";
-import { Theme } from "@/lib/types";
+import { OpenSpaceEvent, Theme } from "@/lib/types";
 import { useAccess } from "@/lib/context/access-context";
 import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { getThemesByEventCode, voteTheme } from "../actions/themes";
+import { getEventByCode } from "../actions/events";
 
 export default function VotePage() {
-  const router = useRouter();
   const { access } = useAccess();
-  
-  // Mock data - In a real app, this would come from your backend
-  const [allowVoting, setAllowVoting] = useState(true);
-  
+  const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
+  const [themes, setThemes] = useState<Theme[]>([]);
+
   useEffect(() => {
-    if (!access) {
-      router.push("/");
-    }
-  }, [access, router]);
+    console.log("access", access);
+    if (!access?.spaceId) return;
 
-  // Mock themes data - In a real app, this would come from your backend
-  const [themes, setThemes] = useState<Theme[]>([
-    {
-      id: "1",
-      title: "GraphQL vs REST en 2024",
-      description: "Comparación de arquitecturas y casos de uso",
-      author: "María García",
-      tags: ["API", "Backend", "Arquitectura"],
-      votes: 5,
-      votedBy: ["user2", "user3"]
-    },
-    {
-      id: "2",
-      title: "Micro-frontends en la práctica",
-      description: "Experiencias reales implementando arquitecturas distribuidas",
-      author: "Carlos Ruiz",
-      tags: ["Frontend", "Arquitectura", "Escalabilidad"],
-      votes: 3,
-      votedBy: ["user1"]
-    }
-  ]);
-
-  const handleVote = async (themeId: string, remove?: boolean) => {
-    if (!allowVoting || !access?.username) return;
-
-    setThemes(prev => prev.map(theme => {
-      if (theme.id === themeId) {
-        if (remove) {
-          return {
-            ...theme,
-            votes: theme.votes - 1,
-            votedBy: theme.votedBy.filter(user => user !== access.username)
-          };
-        } else {
-          return {
-            ...theme,
-            votes: theme.votes + 1,
-            votedBy: [...theme.votedBy, access.username]
-          };
+    const loadEventAndThemes = async () => {
+      try {
+        const eventData = await getEventByCode(access.spaceId);
+        setEvent(eventData);
+        
+        if (eventData?.allowVoting) {
+          const themesData = await getThemesByEventCode(access.spaceId);
+          setThemes(themesData);
         }
+      } catch (error) {
+        console.error("Error loading event data:", error);
       }
-      return theme;
-    }));
+    };
+
+    loadEventAndThemes();
+  }, [access?.spaceId]);
+
+  const handleVote = async (themeId: string) => {
+    if (!event?.allowVoting || !access?.username) return;
+    
+    try {
+      const updatedTheme = await voteTheme(themeId, access.username);
+      
+      if (updatedTheme) {
+        setThemes(prevThemes => 
+          prevThemes.map(theme => 
+            theme.id === themeId ? updatedTheme : theme
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error al votar:", error);
+    }
   };
 
-  if (!access) {
+  if (!access || !event) {
     return null;
   }
 
@@ -76,7 +64,7 @@ export default function VotePage() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Votar Temas</h1>
 
-        {!allowVoting && (
+        {!event?.allowVoting && (
           <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Votaciones Cerradas</AlertTitle>
@@ -92,8 +80,8 @@ export default function VotePage() {
               key={theme.id}
               theme={theme}
               onVote={handleVote}
-              hasVoted={theme.votedBy.includes(access.username)}
-              allowVoting={allowVoting}
+              hasVoted={theme.votedBy.includes(access?.username || "")}
+              allowVoting={event?.allowVoting}
             />
           ))}
         </div>

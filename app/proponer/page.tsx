@@ -7,11 +7,15 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Theme } from "@/lib/types";
+import { OpenSpaceEvent, Theme } from "@/lib/types";
 import { useAccess } from "@/lib/context/access-context";
 import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { getEventByCode } from "../actions/events";
+import { createTheme } from "../actions/themes";
+import { ITheme } from "@/models/Theme";
+import { ObjectId } from "mongoose";
 
 export default function ProposePage() {
   const router = useRouter();
@@ -19,43 +23,46 @@ export default function ProposePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
-  
-  // Mock data - In a real app, this would come from your backend
-  const [allowProposals, setAllowProposals] = useState(true);
+  const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
   
   useEffect(() => {
-    if (!access) {
-      router.push("/");
+    if (access?.spaceId) {
+      getEventByCode(access.spaceId).then((eventData) => {
+        setEvent(eventData);
+      });
     }
-  }, [access, router]);
+  }, [access?.spaceId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!allowProposals) {
+    if (!event?.allowProposals) {
       return;
     }
 
-    const newTheme: Theme = {
-      id: `theme-${Date.now()}`,
+    const newTheme = {
       title,
       description,
       author: access?.username || "Anonymous",
       tags: tags.split(",").map(tag => tag.trim()),
       votes: 0,
-      votedBy: []
+      votedBy: [],
+      event: event?.id || ""
     };
 
-    // In a real app, save to backend
-    router.push("/votar");
-    
+    console.log(newTheme);
+
+    createTheme(newTheme).then(() => {
+      console.log("Theme created");
+      router.push("/votar");
+    });
+
     // Reset form
     setTitle("");
     setDescription("");
     setTags("");
   };
 
-  if (!access) {
+  if (!access || !event) {
     return null;
   }
 
@@ -64,7 +71,7 @@ export default function ProposePage() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Proponer un Tema</h1>
 
-        {!allowProposals && (
+        {!event.allowProposals && (
           <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Propuestas Cerradas</AlertTitle>
@@ -95,7 +102,7 @@ export default function ProposePage() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Escribe un título descriptivo"
                 required
-                disabled={!allowProposals}
+                disabled={!event.allowProposals}
               />
             </div>
 
@@ -108,7 +115,7 @@ export default function ProposePage() {
                 placeholder="Describe brevemente tu propuesta..."
                 className="min-h-[150px]"
                 required
-                disabled={!allowProposals}
+                disabled={!event.allowProposals}
               />
             </div>
 
@@ -119,11 +126,11 @@ export default function ProposePage() {
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 placeholder="tecnología, innovación, desarrollo..."
-                disabled={!allowProposals}
+                disabled={!event.allowProposals}
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={!allowProposals}>
+            <Button type="submit" className="w-full" disabled={!event.allowProposals}>
               Enviar Propuesta
             </Button>
           </form>

@@ -22,7 +22,7 @@ export function ThemeCard({ theme, onVote, hasVoted, allowVoting = true }: Theme
     
     setIsVoting(true);
     try {
-      await onVote(theme.id, hasVoted);
+      await onVote(theme.id ?? "", hasVoted);
     } finally {
       setIsVoting(false);
     }

@@ -31,7 +31,9 @@ export function AccessForm({ onAccess }: AccessFormProps) {
     }
 
     const event = await getEventByCode(spaceId);
-    if (spaceId === event?.code) {
+
+    // TODO: show error if event is not published
+    if (spaceId === event?.code && event.status === 'published') {
       
       onAccess({ spaceId, username });
     } else {

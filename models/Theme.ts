@@ -8,6 +8,7 @@ export interface ITheme extends Document {
   schedule?: string;
   votes: number;
   votedBy: string[];
+  event: mongoose.Types.ObjectId;
 }
 
 const ThemeSchema = new Schema<ITheme>(
@@ -19,6 +20,7 @@ const ThemeSchema = new Schema<ITheme>(
     schedule: { type: String, default: null }, // Horario opcional
     votes: { type: Number, default: 0 }, // Número de votos inicializado en 0
     votedBy: { type: [String], default: [] }, // Lista de usuarios que votaron
+    event: { type: Schema.Types.ObjectId, ref: "Event" },
   },
   { timestamps: true }
 );
