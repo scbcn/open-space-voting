@@ -28,15 +28,15 @@ export function Footer() {
                   Meetup
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="https://conf.softwarecrafters.barcelona" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
                   Conferencia SCBCN
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
 
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <h3 className="font-semibold">Enlaces</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
@@ -55,9 +55,9 @@ export function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
 
-          <div className="space-y-3">
+          <div className="space-y-3 md:col-start-4">
             <h3 className="font-semibold">Comunidad</h3>
             <div className="flex space-x-4">
               <a href="https://github.com/softwarecrafters-barcelona" target="_blank" rel="noopener noreferrer" className="hover:text-primary">

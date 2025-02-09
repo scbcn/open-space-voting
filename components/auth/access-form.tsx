@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SocialLogin } from "./social-login";
 import { getEventByCode } from "@/app/actions/events";
 import { useSession, signOut } from "next-auth/react";
+import { ThemeToggle } from "../theme/theme-toggle";
 
 interface AccessFormProps {
   onAccess: (data: OpenSpaceAccess) => void;
@@ -50,6 +51,24 @@ export function AccessForm({ onAccess }: AccessFormProps) {
   };
 
   return (
+    <>
+    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 max-w-screen-2xl items-center justify-between px-4 md:px-8">
+          <div className="mr-4">
+
+            <Link href="/" className="font-bold hover:text-primary text-sm md:text-base">
+              SCBCN Open Space App
+            </Link>
+          </div>
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <ThemeToggle />
+           
+            
+          </div>
+        </div>
+      </header>
+
+
     <Card className="w-full max-w-md p-6">
       <div className="text-center mb-6">
         <h2 className="text-lg font-semibold">Acceder al Open Space</h2>
@@ -125,5 +144,6 @@ export function AccessForm({ onAccess }: AccessFormProps) {
         </div>
       </div>
     </Card>
+    </>
   );
 }
