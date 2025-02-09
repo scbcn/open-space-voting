@@ -13,6 +13,7 @@ import { SocialLogin } from "./social-login";
 import { getEventByCode } from "@/app/actions/events";
 import { useSession, signOut } from "next-auth/react";
 import { ThemeToggle } from "../theme/theme-toggle";
+import { useEventStore } from "@/lib/store/event-store";
 
 interface AccessFormProps {
   onAccess: (data: OpenSpaceAccess) => void;
@@ -43,7 +44,23 @@ export function AccessForm({ onAccess }: AccessFormProps) {
     const event = await getEventByCode(spaceId);
 
     if (spaceId === event?.code && event.status === 'published') {
+
+      useEventStore.setState({
+        currentEvent: {
+          id: event.id,
+          name: event.name,
+          code: event.code,
+          description: event.description,
+          location: event.location,
+          date: event.date,
+          status: event.status,
+          access: null
+        }
+      });
+
+      useEventStore.persist.rehydrate();
       
+
       onAccess({ spaceId, username });
     } else {
       setError('Para acceder usa el ID de event proporcionado por el organizador');

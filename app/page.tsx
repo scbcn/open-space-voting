@@ -6,12 +6,21 @@ import { WelcomeContent } from "@/components/home/welcome-content";
 import { OpenSpaceAccess } from "@/lib/types";
 import { useAccess } from "@/lib/context/access-context";
 import Link from "next/link";
-
+import { useEventStore } from "@/lib/store/event-store";
 export default function Home() {
   const { access, setAccess } = useAccess();
 
   const handleAccess = (data: OpenSpaceAccess) => {
     setAccess(data);
+  
+    useEventStore.setState({
+      currentEvent: {
+        id: data.spaceId,
+        access: data
+      }
+    });
+    useEventStore.persist.rehydrate();
+
   };
 
   return (

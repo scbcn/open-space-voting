@@ -1,53 +1,54 @@
 "use client";
 
 import { useEffect } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { ThemeCard } from "@/components/themes/theme-card";
 import { OpenSpaceEvent, Theme } from "@/lib/types";
 import { useAccess } from "@/lib/context/access-context";
 import { useState } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getThemesByEventCode, voteTheme } from "../actions/themes";
 import { getEventByCode } from "../actions/events";
 import { useSession } from "next-auth/react";
+import { getStoredEvent } from "@/lib/store/event-store";
 
 export default function VotePage() {
-  const { access } = useAccess();
   const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
   const [themes, setThemes] = useState<Theme[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
 
-  if (!session) {
-    redirect("/error");
-  }
-
+  
   useEffect(() => {
-    console.log("access", access);
-    if (!access?.spaceId) return;
-
     const loadEventAndThemes = async () => {
       try {
-        const eventData = await getEventByCode(access.spaceId);
+        setIsLoading(true);
+        const currentEvent = getStoredEvent();
+        const eventCode = currentEvent?.id;
+        if (!eventCode) return;
+        
+        const eventData = await getEventByCode(eventCode);
         setEvent(eventData);
         
         if (eventData?.allowVoting) {
-          const themesData = await getThemesByEventCode(access.spaceId);
+          const themesData = await getThemesByEventCode(eventCode);
           setThemes(themesData);
         }
       } catch (error) {
         console.error("Error loading event data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadEventAndThemes();
-  }, [access?.spaceId]);
+  }, []);
 
   const handleVote = async (themeId: string) => {
-    if (!event?.allowVoting || !access?.username) return;
-    
+    console.log("session", event?.allowVoting);
     try {
-      const updatedTheme = await voteTheme(themeId, access.username);
+      const updatedTheme = await voteTheme(themeId, session?.user?.name ?? "");
       
       if (updatedTheme) {
         setThemes(prevThemes => 
@@ -61,36 +62,40 @@ export default function VotePage() {
     }
   };
 
-  if (!access || !event) {
-    return null;
-  }
-
   return (
     <main className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Votar Temas</h1>
 
-        {!event?.allowVoting && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Votaciones Cerradas</AlertTitle>
-            <AlertDescription>
-              La votación de temas está temporalmente cerrada por el administrador.
-            </AlertDescription>
-          </Alert>
-        )}
+        {isLoading ? (
+          <div className="flex justify-center items-center min-h-[200px]">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            {!event?.allowVoting && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Votaciones Cerradas</AlertTitle>
+                <AlertDescription>
+                  La votación de temas está temporalmente cerrada por el administrador.
+                </AlertDescription>
+              </Alert>
+            )}
 
-        <div className="space-y-6">
-          {themes.map((theme) => (
-            <ThemeCard
-              key={theme.id}
-              theme={theme}
-              onVote={handleVote}
-              hasVoted={theme.votedBy.includes(access?.username || "")}
-              allowVoting={event?.allowVoting}
-            />
-          ))}
-        </div>
+            <div className="space-y-6">
+              {themes.map((theme) => (
+                <ThemeCard
+                  key={theme.id}
+                  theme={theme}
+                  onVote={handleVote}
+                  hasVoted={theme.votedBy.includes(session?.user?.name ?? "")}
+                  allowVoting={event?.allowVoting}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </main>
   );
