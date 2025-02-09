@@ -15,9 +15,7 @@ export function SocialLogin({ spaceId }: SocialLoginProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
   const handleSocialLogin = async (provider: "google" | "github") => {
-    if (!spaceId) {
-      return;
-    }
+    
 
     setIsLoading(provider);
     try {
@@ -38,7 +36,7 @@ export function SocialLogin({ spaceId }: SocialLoginProps) {
       <Button
         variant="outline"
         onClick={() => handleSocialLogin("google")}
-        disabled={!spaceId || isLoading !== null}
+        disabled={ isLoading !== null}
         className="gap-2"
       >
         {isLoading === "google" ? (
@@ -58,7 +56,7 @@ export function SocialLogin({ spaceId }: SocialLoginProps) {
       <Button
         variant="outline"
         onClick={() => handleSocialLogin("github")}
-        disabled={!spaceId || isLoading !== null}
+        disabled={ isLoading !== null}
         className="gap-2"
       >
         {isLoading === "github" ? (
@@ -69,11 +67,7 @@ export function SocialLogin({ spaceId }: SocialLoginProps) {
         Continuar con GitHub
       </Button>
 
-      {!spaceId && (
-        <p className="text-sm text-muted-foreground text-center">
-          Ingresa el ID del Open Space para continuar
-        </p>
-      )}
+      
     </div>
   );
 }

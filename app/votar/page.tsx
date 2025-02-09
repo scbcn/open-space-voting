@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { ThemeCard } from "@/components/themes/theme-card";
 import { OpenSpaceEvent, Theme } from "@/lib/types";
 import { useAccess } from "@/lib/context/access-context";
@@ -10,11 +10,17 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getThemesByEventCode, voteTheme } from "../actions/themes";
 import { getEventByCode } from "../actions/events";
+import { useSession } from "next-auth/react";
 
 export default function VotePage() {
   const { access } = useAccess();
   const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
   const [themes, setThemes] = useState<Theme[]>([]);
+  const { data: session } = useSession();
+
+  if (!session) {
+    redirect("/error");
+  }
 
   useEffect(() => {
     console.log("access", access);
