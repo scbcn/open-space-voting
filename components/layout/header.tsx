@@ -9,7 +9,9 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { LogoutDialog } from "@/components/auth/logout-dialog";
-
+import { useAuthStore } from "@/lib/store/auth-store";
+import { useEventStore } from "@/lib/store/event-store";
+import { signOut } from "next-auth/react";
 export function Header() {
   const router = useRouter();
   const { access, setAccess } = useAccess();
@@ -20,9 +22,13 @@ export function Header() {
   }
 
   const handleLogout = () => {
+    useAuthStore.getState().logout();
+    useEventStore.getState().clearStore();
+    signOut()
     setAccess(null);
-    router.push("/");
+    
     setShowLogoutDialog(false);
+    router.push("/");
   };
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,8 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getEventByCode } from "../actions/events";
 import { createTheme } from "../actions/themes";
-import { ITheme } from "@/models/Theme";
-import { ObjectId } from "mongoose";
+import { useSession } from "next-auth/react";
+import { getStoredEvent } from "@/lib/store/event-store";
 
 export default function ProposePage() {
   const router = useRouter();
@@ -24,14 +24,23 @@ export default function ProposePage() {
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
-  
+  const { data: session } = useSession();
+
+
   useEffect(() => {
-    if (access?.spaceId) {
-      getEventByCode(access.spaceId).then((eventData) => {
+
+    if(!session?.user?.name){
+      redirect("/");
+    }
+
+    const eventStored = getStoredEvent();
+    console.log("eventStored", eventStored);
+    if (eventStored?.id) {
+      getEventByCode(eventStored.id ?? "").then((eventData) => {
         setEvent(eventData);
       });
     }
-  }, [access?.spaceId]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +71,7 @@ export default function ProposePage() {
     setTags("");
   };
 
-  if (!access || !event) {
+  if (!event) {
     return null;
   }
 
@@ -85,11 +94,11 @@ export default function ProposePage() {
           <div className="mb-6 grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Open Space ID</Label>
-              <Input value={access.spaceId} disabled />
+              <Input value={event.code} disabled />
             </div>
             <div className="space-y-2">
               <Label>Usuario</Label>
-              <Input value={access.username} disabled />
+              <Input value={event.code} disabled />
             </div>
           </div>
 

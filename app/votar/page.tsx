@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { redirect } from "next/navigation";
 import { ThemeCard } from "@/components/themes/theme-card";
 import { OpenSpaceEvent, Theme } from "@/lib/types";
 import { useAccess } from "@/lib/context/access-context";
