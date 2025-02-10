@@ -29,8 +29,9 @@ export default function ProposePage() {
 
   useEffect(() => {
 
-    if(!session?.user?.name){
-      redirect("/");
+    if (!session) {
+      router.push("/");
+      return;
     }
 
     const eventStored = getStoredEvent();
@@ -57,8 +58,6 @@ export default function ProposePage() {
       votedBy: [],
       event: event?.id || ""
     };
-
-    console.log(newTheme);
 
     createTheme(newTheme).then(() => {
       console.log("Theme created");

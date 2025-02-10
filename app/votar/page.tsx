@@ -11,8 +11,10 @@ import { getThemesByEventCode, voteTheme } from "../actions/themes";
 import { getEventByCode } from "../actions/events";
 import { useSession } from "next-auth/react";
 import { getStoredEvent } from "@/lib/store/event-store";
+import { useRouter } from "next/navigation";
 
 export default function VotePage() {
+  const router = useRouter();
   const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
   const [themes, setThemes] = useState<Theme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,6 +22,12 @@ export default function VotePage() {
 
   
   useEffect(() => {
+
+    if (!session) {
+      router.push("/");
+      return;
+    }
+
     const loadEventAndThemes = async () => {
       try {
         setIsLoading(true);

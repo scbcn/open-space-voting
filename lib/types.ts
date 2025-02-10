@@ -44,9 +44,13 @@ export interface OpenSpaceEvent {
   date: string;
   location: string;
   maxParticipants: number;
+  rooms: number;
+  roomsStartAt: string;
+  roomsEndAt: string;
   status: 'draft' | 'published' | 'completed';
   createdAt: string;
   updatedAt: string;
   allowProposals: boolean;
   allowVoting: boolean;
+
 }

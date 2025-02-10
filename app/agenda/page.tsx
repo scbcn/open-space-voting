@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { SessionCard } from "@/components/agenda/session-card";
@@ -14,43 +14,36 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { getStoredEvent } from "@/lib/store/event-store";
+import { OpenSpaceEvent } from "@/lib/types";
+import { getThemesByEventCode } from "../actions/themes";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function AgendaPage() {
   const [date, setDate] = useState<Date>(new Date());
+  const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
+  const [sessions, setSessions] = useState([]); 
+  const { data: session } =  useSession();
+  const router = useRouter();
 
-  // Mock data - In a real app, this would come from your backend
-  const mockSessions = [
-    {
-      id: "1",
-      themeId: "theme1",
-      title: "Introducción a Next.js 13",
-      time: "09:00 - 10:30",
-      location: "Sala A",
-      participantCount: 15,
-      participants: [],
-      notes: "",
-    },
-    {
-      id: "2",
-      themeId: "theme2",
-      title: "Clean Architecture en React",
-      time: "09:00 - 10:30",
-      location: "Sala B",
-      participantCount: 12,
-      participants: [],
-      notes: "",
-    },
-    {
-      id: "3",
-      themeId: "theme3",
-      title: "TypeScript Avanzado",
-      time: "11:00 - 12:30",
-      location: "Sala A",
-      participantCount: 20,
-      participants: [],
-      notes: "",
-    },
-  ];
+  useEffect(() => {
+    const loadData = async () => {
+      if (!session) {
+        router.push("/");
+        return;
+      }
+
+      const eventStored = await getStoredEvent();
+      if (eventStored) {
+        const themes = await getThemesByEventCode(eventStored.id);
+        console.log("themes", themes);
+      }
+    };
+
+    loadData();
+  }, []);
+  
 
   return (
     <main className="min-h-screen py-12 px-4">
@@ -87,8 +80,8 @@ export default function AgendaPage() {
         </div>
 
         <div className="space-y-6">
-          <TimeSlot time="09:00 - 10:30">
-            {mockSessions
+          {/* <TimeSlot time="09:00 - 10:30">
+            {sessions
               .filter(session => session.time === "09:00 - 10:30")
               .map(session => (
                 <SessionCard
@@ -100,10 +93,10 @@ export default function AgendaPage() {
                   participantCount={session.participantCount}
                 />
               ))}
-          </TimeSlot>
+          </TimeSlot> */}
 
-          <TimeSlot time="11:00 - 12:30">
-            {mockSessions
+          {/* <TimeSlot time="11:00 - 12:30">
+            {sessions
               .filter(session => session.time === "11:00 - 12:30")
               .map(session => (
                 <SessionCard
@@ -115,7 +108,7 @@ export default function AgendaPage() {
                   participantCount={session.participantCount}
                 />
               ))}
-          </TimeSlot>
+          </TimeSlot> */}
         </div>
       </div>
     </main>
