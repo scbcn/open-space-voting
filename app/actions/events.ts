@@ -96,7 +96,7 @@ export async function createEvent(data: EventInput) {
   });
   await newEvent.save();
   revalidatePath("/admin/dashboard");
-  return newEvent;
+  return true;
 }
 
 export async function updateEvent(id: string, data: Partial<EventInput>) {
@@ -104,7 +104,6 @@ export async function updateEvent(id: string, data: Partial<EventInput>) {
   await connectDB();
   const event = await Event.findByIdAndUpdate(id, data, { new: true });
   return true;
-  //return event;
 }
 
 export async function deleteEvent(id: string) {

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAccess } from "@/lib/context/access-context";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 export default function EventLayout({
   children,
@@ -10,15 +10,16 @@ export default function EventLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { access } = useAccess();
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
-    if (!access?.isAdmin) {
-      router.push("/admin/login");
+    if (user?.email !== "softwarecraftersbcn@gmail.com") {
+      router.push("/");
     }
-  }, [access, router]);
+  }, [user, router]);
 
-  if (!access?.isAdmin) {
+  if (!isAuthenticated) {
     return null;
   }
 

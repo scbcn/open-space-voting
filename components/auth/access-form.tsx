@@ -15,6 +15,7 @@ import { useSession, signOut } from "next-auth/react";
 import { ThemeToggle } from "../theme/theme-toggle";
 import { useEventStore } from "@/lib/store/event-store";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { useRouter } from "next/navigation";
 
 interface AccessFormProps {
   onAccess: (data: OpenSpaceAccess) => void;
@@ -36,13 +37,13 @@ interface Event {
   allowVoting: boolean;
 }
 
-
-
 export function AccessForm() {
+  const router = useRouter();
   const { data: session } = useSession();
   const [spaceId, setSpaceId] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
+  
 
   useEffect(() => {
     if (session) {
@@ -53,12 +54,6 @@ export function AccessForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-
-    if (!spaceId.trim() || !username.trim()) {
-      setError("Por favor, completa todos los campos");
-      return;
-    }
 
     const event = await getEventByCode(spaceId);
     if (spaceId === event?.code && event.status === 'published') {
@@ -86,16 +81,37 @@ export function AccessForm() {
       const user = {
         id: "",
         name: session?.user?.name ?? "",
-        email: session?.user?.email ?? ""
+        email: session?.user?.email ?? "",
+        role: "user"
       }
       useAuthStore.setState({ user, isAuthenticated: true });
       useAuthStore.persist.rehydrate();
       
-
-      
     } else {
       setError('Para acceder usa el ID de event proporcionado por el organizador');
     }
+
+    if(session?.user.email === "softwarecraftersbcn@gmail.com"){
+      const user = {
+        id: "",
+        name: session?.user?.name ?? "",
+        email: session?.user?.email ?? "",
+        role: "admin"
+      }
+      useAuthStore.setState({ user, isAuthenticated: true });
+      useAuthStore.persist.rehydrate();
+
+      spaceId === "" ? router.push("/admin/dashboard") : router.push("/");
+      return;
+    }
+
+
+    if (!spaceId.trim() || !username.trim()) {
+      setError("Por favor, completa todos los campos");
+      return;
+    }
+
+    
   };
 
   return (
@@ -137,7 +153,6 @@ export function AccessForm() {
               </div>
             </>
           )}
-
 
           {!username && (
             <>
@@ -184,12 +199,7 @@ export function AccessForm() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-        <div className="text-center">
-          <span className="text-sm text-muted-foreground">¿Eres administrador? </span>
-          <Link href="/admin/login" className="text-sm text-primary hover:underline">
-            Acceder al Backoffice
-          </Link>
-        </div>
+        
       </div>
     </Card>
     </>

@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { ThemeCard } from "@/components/themes/theme-card";
-import { useAccess } from "@/lib/context/access-context";
 import { useState } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -19,7 +18,6 @@ export default function VotePage() {
   const { data: session } = useSession();
 
   const event = useEventStore((state) => state.currentEvent);
-  const user = useAuthStore((state) => state.user);
   const authenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {

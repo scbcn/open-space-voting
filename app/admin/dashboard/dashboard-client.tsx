@@ -2,26 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAccess } from "@/lib/context/access-context";
 import { OpenSpaceEvent } from "@/lib/types";
 import { EventCard } from "@/components/admin/event-card";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 export function DashboardClient({ initialEvents }: { initialEvents: OpenSpaceEvent[] }) {
   const router = useRouter();
-  const { access } = useAccess();
   const [events, setEvents] = useState(initialEvents);
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const handleDeleteEvent = (eventCode: string) => {
     setEvents(events.filter(event => event.code !== eventCode));
   };
 
   useEffect(() => {
-    if (!access?.isAdmin) {
-      router.replace("/admin/login");
+    if (user?.email !== "softwarecraftersbcn@gmail.com") {
+      router.replace("/");
     }
-  }, [access, router]);
+  }, [user, router]);
 
-  if (!access?.isAdmin) return null;
+  if (!isAuthenticated) return null;
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

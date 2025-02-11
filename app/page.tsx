@@ -12,13 +12,8 @@ export default function Home() {
   const user = useAuthStore((state) => state.user);
   const sessionEvent = useEventStore((state) => state.currentEvent);
 
- 
-
-
   return (
     <main className="min-h-screen bg-background">
-
-
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
@@ -68,7 +63,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* Call to Action - Only show when logged in */}
       {user?.name && (
         <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto text-center">
