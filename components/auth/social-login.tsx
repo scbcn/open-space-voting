@@ -6,6 +6,7 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useLanguageStore } from "@/lib/store/language-store";
 
 interface SocialLoginProps {
   spaceId: string;
@@ -13,7 +14,7 @@ interface SocialLoginProps {
 
 export function SocialLogin({ spaceId }: SocialLoginProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
-
+  const translations = useLanguageStore((state) => state.translations);
   const handleSocialLogin = async (provider: "google" | "github") => {
     
 
@@ -50,7 +51,7 @@ export function SocialLogin({ spaceId }: SocialLoginProps) {
             className="w-5 h-5"
           />
         )}
-        Continuar con Google
+        {translations.accessForm.socialMedia.google}
       </Button>
 
       <Button
@@ -64,7 +65,7 @@ export function SocialLogin({ spaceId }: SocialLoginProps) {
         ) : (
           <Github className="w-5 h-5" />
         )}
-        Continuar con GitHub
+        {translations.accessForm.socialMedia.github}
       </Button>
 
       

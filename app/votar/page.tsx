@@ -11,17 +11,18 @@ import { useEventStore } from "@/lib/store/event-store";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { Theme } from "@/lib/types";
+import { useLanguageStore } from "@/lib/store/language-store";
+
 export default function VotePage() {
   const router = useRouter();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
-
+  const translations = useLanguageStore((state) => state.translations);
   const event = useEventStore((state) => state.currentEvent);
   const authenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
-
     if (!authenticated) {
       router.push("/");
       return;
@@ -70,7 +71,7 @@ export default function VotePage() {
   return (
     <main className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Votar Temas</h1>
+        <h1 className="text-4xl font-bold mb-8">{translations.votePage.title}</h1>
 
         {isLoading ? (
           <div className="flex justify-center items-center min-h-[200px]">
@@ -81,9 +82,9 @@ export default function VotePage() {
             {!event?.allowVoting && (
               <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Votaciones Cerradas</AlertTitle>
+                <AlertTitle>{translations.votePage.votingClosed}</AlertTitle>
                 <AlertDescription>
-                  La votación de temas está temporalmente cerrada por el administrador.
+                  {translations.votePage.votingClosedDescription}
                 </AlertDescription>
               </Alert>
             )}

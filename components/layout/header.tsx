@@ -11,6 +11,7 @@ import { LogoutDialog } from "@/components/auth/logout-dialog";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useEventStore } from "@/lib/store/event-store";
 import { signOut } from "next-auth/react";
+import { LanguageSelector } from "@/components/language-selector";
 
 export function Header() {
   const router = useRouter();
@@ -59,6 +60,7 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+            <LanguageSelector />
             <ThemeToggle />
             <Card className="hidden sm:flex items-center gap-2 md:gap-4 px-2 md:px-4 py-2">
               <div className="flex items-center gap-2">

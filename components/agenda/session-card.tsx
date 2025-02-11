@@ -2,9 +2,10 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, MapPin, Users, ThumbsUp, User, Star } from "lucide-react";
+import { Clock, ThumbsUp, User, Star } from "lucide-react";
 import Link from "next/link";
 import { Session } from "@/lib/types";
+import { useLanguageStore } from "@/lib/store/language-store";
 
 interface SessionCardProps {
   session: Session;
@@ -18,6 +19,8 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ session, title, time, location, participantCount, votes, author, isStarred }: SessionCardProps) {
+  const translations = useLanguageStore((state) => state.translations);
+
   return (
     <Card className="relative p-4 hover:shadow-lg transition-shadow">
       {isStarred && (
@@ -29,11 +32,11 @@ export function SessionCard({ session, title, time, location, participantCount, 
       <div className="space-y-2 text-sm text-muted-foreground mb-4">
         <div className="flex items-center gap-2">
           <ThumbsUp className="w-4 h-4" />
-          <span>{votes} votos</span>
+          <span>{votes} {translations.sessionCard.votes}</span>
         </div>
         <div className="flex items-center gap-2">
           <User className="w-4 h-4" />
-          <span>Por {author}</span>
+          <span>{translations.sessionCard.by} {author}</span>
         </div>
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4" />
@@ -45,11 +48,11 @@ export function SessionCard({ session, title, time, location, participantCount, 
         </div> */}
         {/* <div className="flex items-center gap-2">
           <Users className="w-4 h-4" />
-          <span>{participantCount} participantes</span>
+          <span>{participantCount} {translations.sessionCard.participants}</span>
         </div> */}
       </div>
       <Link href={`/sesion/${session.id}`}>
-        <Button className="w-full">Ver Detalles</Button>
+        <Button className="w-full">{translations.sessionCard.viewDetails}</Button>
       </Link>
     </Card>
   );

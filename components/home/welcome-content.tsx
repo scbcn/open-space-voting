@@ -5,10 +5,12 @@ import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { useEventStore } from "@/lib/store/event-store";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { useLanguageStore } from "@/lib/store/language-store";
 
 export function WelcomeContent() {
   const event = useEventStore((state) => state.currentEvent);
   const user = useAuthStore((state) => state.user);
+  const translations = useLanguageStore((state) => state.translations);
 
   if (!event || !user) {
     console.log("No event found");
@@ -28,19 +30,19 @@ export function WelcomeContent() {
         <Link href="/proponer" className="w-full sm:w-auto">
           <Button size="lg" className="w-full sm:w-auto gap-2">
             <MessageSquare className="w-4 h-4" />
-            Proponer Tema
+            {translations.welcome.propose}
           </Button>
         </Link>
         <Link href="/votar" className="w-full sm:w-auto">
           <Button size="lg" variant="secondary" className="w-full sm:w-auto gap-2">
             <ThumbsUp className="w-4 h-4" />
-            Votar Temas
+            {translations.welcome.vote}
           </Button>
         </Link>
         <Link href="/agenda" className="w-full sm:w-auto">
           <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2">
             <Calendar className="w-4 h-4" />
-            Ver Agenda
+            {translations.welcome.agenda}
           </Button>
         </Link>
       </div>

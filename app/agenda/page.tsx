@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { SessionCard } from "@/components/agenda/session-card";
 import { TimeSlot } from "@/components/agenda/time-slot";
 import { Card } from "@/components/ui/card";
@@ -12,14 +12,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format, setDate } from "date-fns";
 import { es } from "date-fns/locale";
-import { getStoredEvent, useEventStore } from "@/lib/store/event-store";
+import { useEventStore } from "@/lib/store/event-store";
 import { getThemesByEventCode } from "../actions/themes";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { Theme } from "@/lib/types";
+import { useLanguageStore } from "@/lib/store/language-store";
 
 export default function AgendaPage() {
   const router = useRouter();
@@ -27,6 +26,7 @@ export default function AgendaPage() {
   const user = useAuthStore((state) => state.user);
   const authenticated = useAuthStore((state) => state.isAuthenticated);
   const [themes, setThemes] = useState<Theme[]>([]);
+  const translations = useLanguageStore((state) => state.translations);
 
   useEffect(() => {
 
@@ -56,7 +56,7 @@ export default function AgendaPage() {
     <main className="min-h-screen py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Agenda del Evento</h1>
+          <h1 className="text-4xl font-bold">{translations.agendaPage.title}</h1>
           
           {/* <div className="flex items-center gap-4">
             <Button variant="outline" size="icon">
@@ -103,8 +103,8 @@ export default function AgendaPage() {
                   title={theme.title}
                   time={event?.roomsStartAt ?? ""}
                   location={theme.location ?? ""}
-                  participantCount={theme.participantCount || 0}
-                  isStarred={index < (event?.rooms || 0)}
+                  participantCount={theme.participantCount ?? 0}
+                  isStarred={index < (event?.rooms ?? 0)}
                 />
               ))}
           </div>

@@ -5,7 +5,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, Video, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
+import { useLanguageStore } from "@/lib/store/language-store";
+import { useAuthStore } from "@/lib/store/auth-store";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 interface SessionDetailsProps {
   session: Session;
   theme: Theme;
@@ -14,6 +17,16 @@ interface SessionDetailsProps {
 }
 
 export function SessionDetails({ session, theme, onJoin, isParticipant }: SessionDetailsProps) {
+  const translations = useLanguageStore((state) => state.translations);
+  const user = useAuthStore((state) => state.user);
+  const authenticated = useAuthStore((state) => state.isAuthenticated);
+  const router = useRouter();
+  useEffect(() => {
+    if (!user || !authenticated) {
+      router.push("/");
+    }
+  }, [user, authenticated, router]);
+
   return (
     <Card className="p-6">
       <div className="flex justify-between items-start mb-6">
@@ -43,7 +56,7 @@ export function SessionDetails({ session, theme, onJoin, isParticipant }: Sessio
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-5 h-5 text-muted-foreground" />
-            <h3 className="font-semibold">Votos: {theme.votes}</h3>
+            <h3 className="font-semibold">{translations.sessionCard.votes}: {theme.votes}</h3>
           </div>
           
         </Card>

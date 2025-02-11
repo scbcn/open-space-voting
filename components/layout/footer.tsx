@@ -2,8 +2,9 @@
 
 import { Github, Twitter } from "lucide-react";
 import Link from "next/link";
-
+import { useLanguageStore } from "@/lib/store/language-store";
 export function Footer() {
+  const translations = useLanguageStore((state) => state.translations);
   return (
     <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container py-8 md:py-10 px-4 md:px-8">
@@ -11,7 +12,7 @@ export function Footer() {
           <div className="space-y-3">
             <h3 className="font-semibold">SCBCN Open Space App</h3>
             <p className="text-sm text-muted-foreground">
-              Una aplicación para gestionar Open Spaces, desarrollada por la comunidad de Software Crafters Barcelona.
+              {translations.footer.appDescription}
             </p>
           </div>
 
@@ -20,7 +21,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <a href="https://softwarecrafters.barcelona" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
-                  Sitio Web
+                  {translations.footer.links.website}
                 </a>
               </li>
               <li>
@@ -58,7 +59,7 @@ export function Footer() {
           </div> */}
 
           <div className="space-y-3 md:col-start-4">
-            <h3 className="font-semibold">Comunidad</h3>
+            <h3 className="font-semibold">{translations.footer.links.community}</h3>
             <div className="flex space-x-4">
               {/* <a href="https://github.com/softwarecrafters-barcelona" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
                 <Github className="h-5 w-5" />
@@ -68,13 +69,13 @@ export function Footer() {
               </a>
             </div>
             <p className="text-sm text-muted-foreground">
-              Únete a nuestra comunidad y participa en nuestros eventos.
+              {translations.footer.links.joinCommunity}
             </p>
           </div>
         </div>
 
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Software Crafters Barcelona. Todos los derechos reservados.</p>
+          <p>© {new Date().getFullYear()} {translations.footer.copyright}</p>
         </div>
       </div>
     </footer>

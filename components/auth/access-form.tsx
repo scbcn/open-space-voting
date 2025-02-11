@@ -16,10 +16,9 @@ import { ThemeToggle } from "../theme/theme-toggle";
 import { useEventStore } from "@/lib/store/event-store";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useRouter } from "next/navigation";
+import { LanguageSelector } from "../language-selector";
+import { useLanguageStore } from "@/lib/store/language-store";
 
-interface AccessFormProps {
-  onAccess: (data: OpenSpaceAccess) => void;
-}
 
 interface Event {
   id: string;
@@ -43,7 +42,7 @@ export function AccessForm() {
   const [spaceId, setSpaceId] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
-  
+  const translations = useLanguageStore((state) => state.translations);
 
   useEffect(() => {
     if (session) {
@@ -88,7 +87,7 @@ export function AccessForm() {
       useAuthStore.persist.rehydrate();
       
     } else {
-      setError('Para acceder usa el ID de event proporcionado por el organizador');
+      setError(translations.accessForm.wrongOpenSpaceId);
     }
 
     if(session?.user.email === "softwarecraftersbcn@gmail.com"){
@@ -105,13 +104,10 @@ export function AccessForm() {
       return;
     }
 
-
     if (!spaceId.trim() || !username.trim()) {
-      setError("Por favor, completa todos los campos");
+      setError(translations.accessForm.errorOpenSpaceId);
       return;
     }
-
-    
   };
 
   return (
@@ -126,8 +122,7 @@ export function AccessForm() {
           </div>
           <div className="flex items-center space-x-2 md:space-x-4">
             <ThemeToggle />
-           
-            
+            <LanguageSelector />
           </div>
         </div>
       </header>
@@ -135,7 +130,7 @@ export function AccessForm() {
 
     <Card className="w-full max-w-md p-6">
       <div className="text-center mb-6">
-        <h2 className="text-lg font-semibold">Acceder al Open Space</h2>
+        <h2 className="text-lg font-semibold">{translations.accessForm.title}</h2>
         
       </div>
 
@@ -145,11 +140,11 @@ export function AccessForm() {
             <>
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-               Accediendo como <span className="font-bold text-primary">{username}</span>
+              {translations.accessForm.accessAs} <span className="font-bold text-primary">{username}</span>
               </p>
             </div>
             <div className="text-center p-6">
-              <Button variant="outline" onClick={() => signOut()}>🔄 Entrar con otra cuenta</Button>
+              <Button variant="outline" onClick={() => signOut()}>🔄 {translations.accessForm.useOtherAccount}</Button>
               </div>
             </>
           )}
@@ -157,7 +152,7 @@ export function AccessForm() {
           {!username && (
             <>
               <p className="text-sm text-muted-foreground mt-1">
-                Ingresa con tu cuenta de Google o Github
+              {translations.accessForm.useGoogleOrGithub}
               </p>
               <SocialLogin spaceId={spaceId} />
             </>
@@ -180,7 +175,7 @@ export function AccessForm() {
             type="text"
             value={spaceId}
             onChange={(e) => setSpaceId(e.target.value)}
-            placeholder="Ingresa el ID del Open Space"
+            placeholder={translations.accessForm.insertOpenSpaceId}
             required
           />
         </div>
@@ -189,9 +184,11 @@ export function AccessForm() {
             
           </div>
 
-          <Button type="submit" className="w-full">
-          🚀 Acceder al Open Space
-          </Button>
+          { session?.user.email ? (
+            <Button type="submit" className="w-full">
+              🚀 {translations.accessForm.title}
+            </Button>
+          ) : <p>{translations.accessForm.settingUpOpenSpace}</p>}
         </form>
         {error && (
         <Alert variant="destructive" className="mb-6">

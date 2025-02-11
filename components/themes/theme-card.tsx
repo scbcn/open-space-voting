@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThumbsUp } from "lucide-react";
 import { useState } from "react";
+import { useLanguageStore } from "@/lib/store/language-store";
 
 interface ThemeCardProps {
   theme: Theme;
@@ -16,6 +17,7 @@ interface ThemeCardProps {
 
 export function ThemeCard({ theme, onVote, hasVoted, allowVoting = true }: ThemeCardProps) {
   const [isVoting, setIsVoting] = useState(false);
+  const translations = useLanguageStore((state) => state.translations);
 
   const handleVote = async () => {
     if (!allowVoting) return;
@@ -33,7 +35,9 @@ export function ThemeCard({ theme, onVote, hasVoted, allowVoting = true }: Theme
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-xl font-semibold">{theme.title}</h3>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">{theme.votes} votos</span>
+          <span className="text-sm text-muted-foreground">
+            {theme.votes} {translations.themeCard.votes}
+          </span>
           <Button
             variant={hasVoted ? "secondary" : "default"}
             size="sm"
@@ -42,7 +46,7 @@ export function ThemeCard({ theme, onVote, hasVoted, allowVoting = true }: Theme
             className="gap-2"
           >
             <ThumbsUp className={`w-4 h-4 ${hasVoted ? "fill-current" : ""}`} />
-            {hasVoted ? "Votado" : "Votar"}
+            {hasVoted ? translations.themeCard.voted : translations.themeCard.vote}
           </Button>
         </div>
       </div>
@@ -58,7 +62,7 @@ export function ThemeCard({ theme, onVote, hasVoted, allowVoting = true }: Theme
       </div>
       
       <div className="mt-4 text-sm text-muted-foreground">
-        Propuesto por {theme.author}
+        {translations.themeCard.proposedBy} {theme.author}
       </div>
     </Card>
   );

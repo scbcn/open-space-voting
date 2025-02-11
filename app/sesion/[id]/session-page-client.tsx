@@ -11,7 +11,6 @@ interface SessionPageClientProps {
   initialSession: Session & { title: string, votes: number, description: string, createdBy: string, notes: string, tags: string[] };
 }
 
-
 export function SessionPageClient({ initialSession }: SessionPageClientProps) {
   const [session, setSession] = useState(initialSession);
   const user = useAuthStore((state) => state.user);
