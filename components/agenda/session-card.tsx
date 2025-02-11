@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, MapPin, Users, ThumbsUp, User } from "lucide-react";
+import { Clock, MapPin, Users, ThumbsUp, User, Star } from "lucide-react";
 import Link from "next/link";
 import { Session } from "@/lib/types";
 
@@ -14,11 +14,17 @@ interface SessionCardProps {
   participantCount: number;
   votes: number;
   author: string;
+  isStarred?: boolean;
 }
 
-export function SessionCard({ session, title, time, location, participantCount, votes, author }: SessionCardProps) {
+export function SessionCard({ session, title, time, location, participantCount, votes, author, isStarred }: SessionCardProps) {
   return (
-    <Card className="p-4 hover:shadow-lg transition-shadow">
+    <Card className="relative p-4 hover:shadow-lg transition-shadow">
+      {isStarred && (
+        <div className="absolute top-2 right-2">
+          <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+        </div>
+      )}
       <h3 className="font-semibold text-lg mb-3">{title}</h3>
       <div className="space-y-2 text-sm text-muted-foreground mb-4">
         <div className="flex items-center gap-2">

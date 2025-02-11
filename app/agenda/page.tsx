@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { SessionCard } from "@/components/agenda/session-card";
 import { TimeSlot } from "@/components/agenda/time-slot";
 import { Card } from "@/components/ui/card";
@@ -89,7 +89,7 @@ export default function AgendaPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {themes
               .toSorted((a, b) => (b.votes || 0) - (a.votes || 0))
-              .map(theme => (
+              .map((theme, index) => (
                 <SessionCard
                   key={theme.id}
                   session={{
@@ -104,6 +104,7 @@ export default function AgendaPage() {
                   time={event?.roomsStartAt ?? ""}
                   location={theme.location ?? ""}
                   participantCount={theme.participantCount || 0}
+                  isStarred={index < (event?.rooms || 0)}
                 />
               ))}
           </div>

@@ -60,9 +60,9 @@ export function Footer() {
           <div className="space-y-3 md:col-start-4">
             <h3 className="font-semibold">Comunidad</h3>
             <div className="flex space-x-4">
-              <a href="https://github.com/softwarecrafters-barcelona" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+              {/* <a href="https://github.com/softwarecrafters-barcelona" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
                 <Github className="h-5 w-5" />
-              </a>
+              </a> */}
               <a href="https://twitter.com/bcnswcraft" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
                 <Twitter className="h-5 w-5" />
               </a>
