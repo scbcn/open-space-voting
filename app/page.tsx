@@ -3,35 +3,29 @@
 import { Button } from "@/components/ui/button";
 import { AccessForm } from "@/components/auth/access-form";
 import { WelcomeContent } from "@/components/home/welcome-content";
-import { OpenSpaceAccess } from "@/lib/types";
-import { useAccess } from "@/lib/context/access-context";
 import Link from "next/link";
-import { useEventStore } from "@/lib/store/event-store";
+import {  useEventStore } from "@/lib/store/event-store";
+import { useAuthStore } from "@/lib/store/auth-store";
+
 export default function Home() {
-  const { access, setAccess } = useAccess();
 
-  const handleAccess = (data: OpenSpaceAccess) => {
-    setAccess(data);
-  
-    useEventStore.setState({
-      currentEvent: {
-        id: data.spaceId,
-        access: data
-      }
-    });
-    useEventStore.persist.rehydrate();
+  const user = useAuthStore((state) => state.user);
+  const sessionEvent = useEventStore((state) => state.currentEvent);
 
-  };
+ 
+
 
   return (
     <main className="min-h-screen bg-background">
+
+
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          {!access ? (
+          {!sessionEvent ? (
             <div className="flex flex-col items-center">
               <h1 className="text-4xl font-bold mb-8">Bienvenido al Open Space</h1>
-              <AccessForm onAccess={handleAccess} />
+              <AccessForm  />
             </div>
           ) : (
             <WelcomeContent />
@@ -40,10 +34,11 @@ export default function Home() {
       </section>
 
       {/* Rules Section - Only show when logged in */}
-      {access && (
+      {user?.name && (
         <section className="py-16 px-4 bg-muted/50">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12">Principios del Open Space</h2>
+
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 {
@@ -74,7 +69,7 @@ export default function Home() {
       )}
 
       {/* Call to Action - Only show when logged in */}
-      {access && (
+      {user?.name && (
         <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">¿Listo para participar?</h2>

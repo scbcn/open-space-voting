@@ -1,20 +1,15 @@
-import { mockSessions } from "@/lib/data/sessions";
 import { SessionPageClient } from "./session-page-client";
-
-// Generate static params for all known session IDs
-export function generateStaticParams() {
-  return Object.keys(mockSessions).map((id) => ({
-    id,
-  }));
-}
-
+import { getThemeById } from "@/app/actions/themes";
+import { Theme } from "@/lib/types";
 export default async function SessionPage(props: Readonly<{
   params: Promise<{ id: string }>
 }>) {
-  const params = await props.params;
-  const session = mockSessions[params.id];
 
-  if (!session) {
+  const params = await props.params;
+  const currentTheme: Theme | null = await getThemeById(params.id);
+
+
+  if (!currentTheme) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -25,5 +20,15 @@ export default async function SessionPage(props: Readonly<{
     );
   }
 
-  return <SessionPageClient initialSession={session} />;
+  return <SessionPageClient initialSession={{
+    id: currentTheme.id ?? '',
+    themeId: currentTheme.id ?? '',
+    participants: currentTheme.votedBy,
+    notes: '',
+    title: currentTheme.title,
+    votes: currentTheme.votes,
+    description: currentTheme.description ?? '',
+    tags: currentTheme.tags ?? [],
+    createdBy: currentTheme.author
+  }} />;
 }

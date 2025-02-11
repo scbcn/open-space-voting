@@ -14,10 +14,12 @@ import { useEventStore } from "@/lib/store/event-store";
 import { signOut } from "next-auth/react";
 export function Header() {
   const router = useRouter();
-  const { access, setAccess } = useAccess();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const event = useEventStore((state) => state.currentEvent);
+  const authenticated = useAuthStore((state) => state.isAuthenticated);
 
-  if (!access || window.location.pathname.includes('/admin/login')) {
+  if (!user || !event || !authenticated || window.location.pathname === '/admin/login') {
     return null;
   }
 
@@ -25,8 +27,6 @@ export function Header() {
     useAuthStore.getState().logout();
     useEventStore.getState().clearStore();
     signOut()
-    setAccess(null);
-    
     setShowLogoutDialog(false);
     router.push("/");
   };
@@ -45,20 +45,20 @@ export function Header() {
             <Card className="hidden md:flex items-center gap-4 px-4 py-2">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{access.username}</span>
+                <span className="text-sm font-medium">{user.name}</span>
               </div>
               <div className="h-4 w-px bg-muted" />
               <div className="text-sm text-muted-foreground">
-                ID: {access.spaceId}
+                ID: {event.code}
               </div>
             </Card>
             <Card className="md:hidden flex flex-col items-start px-3 py-2">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs font-medium">{access.username}</span>
+                <span className="text-xs font-medium">{user.name}</span>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
-                ID: {access.spaceId}
+                ID: {event.code}
               </div>
             </Card>
             <Button 

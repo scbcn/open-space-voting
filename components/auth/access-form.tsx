@@ -14,12 +14,31 @@ import { getEventByCode } from "@/app/actions/events";
 import { useSession, signOut } from "next-auth/react";
 import { ThemeToggle } from "../theme/theme-toggle";
 import { useEventStore } from "@/lib/store/event-store";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 interface AccessFormProps {
   onAccess: (data: OpenSpaceAccess) => void;
 }
 
-export function AccessForm({ onAccess }: AccessFormProps) {
+interface Event {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  date: string;
+  location: string;
+  maxParticipants: number;
+  rooms: number;
+  roomsStartAt: string;
+  roomsEndAt: string;
+  status: string;
+  allowProposals: boolean;
+  allowVoting: boolean;
+}
+
+
+
+export function AccessForm() {
   const { data: session } = useSession();
   const [spaceId, setSpaceId] = useState("");
   const [username, setUsername] = useState("");
@@ -42,26 +61,38 @@ export function AccessForm({ onAccess }: AccessFormProps) {
     }
 
     const event = await getEventByCode(spaceId);
-
     if (spaceId === event?.code && event.status === 'published') {
-
       useEventStore.setState({
         currentEvent: {
           id: event.id,
-          name: event.name,
           code: event.code,
+          name: event.name,
           description: event.description,
-          location: event.location,
           date: event.date,
+          location: event.location,
+          maxParticipants: event.maxParticipants,
+          rooms: event.rooms,
+          roomsStartAt: event.roomsStartAt,
+          roomsEndAt: event.roomsEndAt,
           status: event.status,
-          access: null
+          allowProposals: event.allowProposals,
+          allowVoting: event.allowVoting
+
         }
       });
 
       useEventStore.persist.rehydrate();
+
+      const user = {
+        id: "",
+        name: session?.user?.name ?? "",
+        email: session?.user?.email ?? ""
+      }
+      useAuthStore.setState({ user, isAuthenticated: true });
+      useAuthStore.persist.rehydrate();
       
 
-      onAccess({ spaceId, username });
+      
     } else {
       setError('Para acceder usa el ID de event proporcionado por el organizador');
     }

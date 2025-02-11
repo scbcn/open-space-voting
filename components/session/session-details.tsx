@@ -27,14 +27,14 @@ export function SessionDetails({ session, theme, onJoin, isParticipant }: Sessio
             ))}
           </div>
         </div>
-        <Button
+        {/* <Button
           onClick={onJoin}
           disabled={isParticipant}
           className="gap-2"
         >
           <Users className="w-4 h-4" />
           {isParticipant ? "Ya participas" : "Unirme"}
-        </Button>
+        </Button> */}
       </div>
 
       <p className="text-muted-foreground mb-6">{theme.description}</p>
@@ -43,14 +43,12 @@ export function SessionDetails({ session, theme, onJoin, isParticipant }: Sessio
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-5 h-5 text-muted-foreground" />
-            <h3 className="font-semibold">Participantes</h3>
+            <h3 className="font-semibold">Votos: {theme.votes}</h3>
           </div>
-          <p className="text-muted-foreground">
-            {session.participants.length} personas participando
-          </p>
+          
         </Card>
 
-        {session.videoCallUrl && (
+        {/* {session.videoCallUrl && (
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Video className="w-5 h-5 text-muted-foreground" />
@@ -62,10 +60,10 @@ export function SessionDetails({ session, theme, onJoin, isParticipant }: Sessio
               </a>
             </Button>
           </Card>
-        )}
+        )} */}
       </div>
 
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <div className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-muted-foreground" />
           <h3 className="font-semibold">Notas de la sesión</h3>
@@ -73,7 +71,7 @@ export function SessionDetails({ session, theme, onJoin, isParticipant }: Sessio
         <Card className="p-4 min-h-[200px] bg-muted/50">
           <p className="text-muted-foreground whitespace-pre-wrap">{session.notes || "Aún no hay notas para esta sesión."}</p>
         </Card>
-      </div>
+      </div> */}
     </Card>
   );
 }

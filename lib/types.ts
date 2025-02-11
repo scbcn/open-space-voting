@@ -8,6 +8,9 @@ export interface Theme {
   votes: number;
   votedBy: string[];
   event: string;
+  time?: string;
+  location?: string;
+  participantCount?: number;
 }
 
 export interface Session {

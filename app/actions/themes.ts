@@ -4,8 +4,9 @@ import { connectDB } from "@/lib/mongoose";
 import Theme, { ITheme } from "@/models/Theme";
 import mongoose from 'mongoose';
 import { Theme as OpenSpaceTheme } from "@/lib/types";
-import Event, { IOpenSpaceEvent } from "@/models/Event";
-import { revalidatePath } from "next/cache";
+import Event from "@/models/Event";
+
+
 export const getThemesByEventId = async (eventId: string) => {
   await connectDB();
   if (!mongoose.Types.ObjectId.isValid(eventId)) {
@@ -33,7 +34,6 @@ export const getThemesByEventCode = async (eventCode: string) => {
     }
 
     const themes = await Theme.find({ event: event._id });
-    
     const changeStream = Theme.watch();
 
     changeStream.on("change", (change) => {
@@ -56,6 +56,12 @@ export const getThemesByEventCode = async (eventCode: string) => {
     console.error("Error buscando temas:", error);
     return [];
   }
+};
+
+export const getThemeById = async (themeId: string) => {
+  await connectDB();
+  const theme = await Theme.findById(themeId);
+  return theme;
 };
 
 

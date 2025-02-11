@@ -2,28 +2,29 @@
 
 import { useEffect } from "react";
 import { ThemeCard } from "@/components/themes/theme-card";
-import { OpenSpaceEvent, Theme } from "@/lib/types";
 import { useAccess } from "@/lib/context/access-context";
 import { useState } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getThemesByEventCode, voteTheme } from "../actions/themes";
-import { getEventByCode } from "../actions/events";
 import { useSession } from "next-auth/react";
-import { getStoredEvent } from "@/lib/store/event-store";
+import { useEventStore } from "@/lib/store/event-store";
 import { useRouter } from "next/navigation";
-
+import { useAuthStore } from "@/lib/store/auth-store";
+import { Theme } from "@/lib/types";
 export default function VotePage() {
   const router = useRouter();
-  const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
   const [themes, setThemes] = useState<Theme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
 
-  
+  const event = useEventStore((state) => state.currentEvent);
+  const user = useAuthStore((state) => state.user);
+  const authenticated = useAuthStore((state) => state.isAuthenticated);
+
   useEffect(() => {
 
-    if (!session) {
+    if (!authenticated) {
       router.push("/");
       return;
     }
@@ -31,15 +32,9 @@ export default function VotePage() {
     const loadEventAndThemes = async () => {
       try {
         setIsLoading(true);
-        const currentEvent = getStoredEvent();
-        const eventCode = currentEvent?.id;
-        if (!eventCode) return;
-        
-        const eventData = await getEventByCode(eventCode);
-        setEvent(eventData);
-        
-        if (eventData?.allowVoting) {
-          const themesData = await getThemesByEventCode(eventCode);
+        if (!event?.code) return;
+        if (event?.allowVoting) {
+          const themesData = await getThemesByEventCode(event.code);
           setThemes(themesData);
         }
       } catch (error) {
@@ -54,6 +49,11 @@ export default function VotePage() {
 
   const handleVote = async (themeId: string) => {
     console.log("session", event?.allowVoting);
+
+    if (!event?.allowVoting) {
+      return;
+    }
+
     try {
       const updatedTheme = await voteTheme(themeId, session?.user?.name ?? "");
       

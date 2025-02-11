@@ -1,47 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { OpenSpaceEvent, Theme } from "@/lib/types";
-import { useAccess } from "@/lib/context/access-context";
 import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { getEventByCode } from "../actions/events";
 import { createTheme } from "../actions/themes";
 import { useSession } from "next-auth/react";
-import { getStoredEvent } from "@/lib/store/event-store";
+import {  useEventStore } from "@/lib/store/event-store";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 export default function ProposePage() {
   const router = useRouter();
-  const { access } = useAccess();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [tags, setTags] = useState("");
-  const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
+  
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [tags, setTags] = useState<string>("");
   const { data: session } = useSession();
 
+  const event = useEventStore((state) => state.currentEvent);
+  const user = useAuthStore((state) => state.user);
 
-  useEffect(() => {
-
-    if (!session) {
-      router.push("/");
-      return;
-    }
-
-    const eventStored = getStoredEvent();
-    console.log("eventStored", eventStored);
-    if (eventStored?.id) {
-      getEventByCode(eventStored.id ?? "").then((eventData) => {
-        setEvent(eventData);
-      });
-    }
-  }, []);
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +36,7 @@ export default function ProposePage() {
     const newTheme = {
       title,
       description,
-      author: access?.username || "Anonymous",
+      author: user?.name ?? "Anonymous",
       tags: tags.split(",").map(tag => tag.trim()),
       votes: 0,
       votedBy: [],
@@ -93,11 +77,11 @@ export default function ProposePage() {
           <div className="mb-6 grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Open Space ID</Label>
-              <Input value={event.code} disabled />
+              <Input value={event?.code || ""} disabled />
             </div>
             <div className="space-y-2">
               <Label>Usuario</Label>
-              <Input value={event.code} disabled />
+              <Input value={session?.user?.name || ""} disabled />
             </div>
           </div>
 

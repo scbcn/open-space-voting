@@ -3,22 +3,16 @@
 import { Button } from "@/components/ui/button";
 import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useAccess } from "@/lib/context/access-context";
-import { OpenSpaceEvent } from "@/lib/types";
-import { getEventByCode } from "@/app/actions/events";
+import { useEventStore } from "@/lib/store/event-store";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 export function WelcomeContent() {
-  const { access } = useAccess();
-  const [event, setEvent] = useState<OpenSpaceEvent | null>(null);
+  const event = useEventStore((state) => state.currentEvent);
+  const user = useAuthStore((state) => state.user);
 
-  useEffect(() => {
-    if (access?.spaceId) {
-      getEventByCode(access.spaceId).then(setEvent);
-    }
-  }, [access?.spaceId]);
-
-  if (!event) {
+  if (!event || !user) {
+    console.log("No event found");
+    console.log("No user found");
     return null;
   }
 
@@ -26,6 +20,7 @@ export function WelcomeContent() {
     <>
       <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent px-4 text-center">
         {event.name}
+
       </h1>
       <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto px-4 text-center">
         {event.description}

@@ -8,8 +8,14 @@ interface Event {
   code?: string
   description?: string
   location?: string
+  maxParticipants?: number
+  rooms?: number
+  roomsStartAt?: string
+  roomsEndAt?: string
   date?: string
   status?: string
+  allowProposals?: boolean
+  allowVoting?: boolean
   access?: OpenSpaceAccess | null
 }
 
