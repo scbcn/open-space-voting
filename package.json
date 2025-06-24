@@ -73,7 +73,7 @@
   },
   "devDependencies": {
     "@types/mongoose": "^5.11.96",
-    "eslint-config-next": "15.1.4"
+    "eslint-config-next": "15.3.4"
   },
   "overrides": {
     "@types/react": "19.0.4",
